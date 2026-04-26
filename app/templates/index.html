@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Instagram Auto-DM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<!-- ===================== LAYOUT ===================== -->
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h1>Auto-DM</h1>
+      <p>Instagram keyword automation</p>
+    </div>
+
+    <div class="nav-item active" data-page="dashboard">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6"/></svg>
+      Dashboard
+    </div>
+
+    <div class="nav-item" data-page="automations">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      Automations
+    </div>
+
+    <div class="nav-item" data-page="leads">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      Leads
+    </div>
+
+    <div class="nav-item" data-page="logs">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      DM Logs
+    </div>
+
+    <div class="sidebar-status">
+      <div style="display:flex;align-items:center;margin-bottom:4px;">
+        <span class="status-dot offline" id="status-dot"></span>
+        <span style="font-size:12px;font-weight:600;" id="status-label">Checking...</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);" id="status-scheduler"></div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- =================== DASHBOARD =================== -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <h2>Dashboard</h2>
+          <p>Overview of your automation activity</p>
+        </div>
+        <button class="btn btn-ghost" id="btn-trigger-poll" onclick="triggerPoll()">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          Run Now
+        </button>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="label">Automations</div>
+          <div class="value" id="stat-automations">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Active</div>
+          <div class="value accent" id="stat-active">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Total Leads</div>
+          <div class="value green" id="stat-leads">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Recent DMs</div>
+          <div class="value" id="stat-dms">—</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Recent Activity</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>User</th>
+                <th>Comment</th>
+                <th>Status</th>
+                <th>Auto #</th>
+              </tr>
+            </thead>
+            <tbody id="recent-activity-body">
+              <tr><td colspan="5" class="text-muted" style="padding:24px;text-align:center;">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================== AUTOMATIONS =================== -->
+    <div class="page" id="page-automations">
+      <div class="page-header">
+        <div>
+          <h2>Automations</h2>
+          <p>Keyword → DM rules</p>
+        </div>
+        <button class="btn btn-primary" onclick="openNewModal()">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          New Automation
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Keyword</th>
+                <th>Message preview</th>
+                <th>Follow-gate</th>
+                <th>Active</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="automations-body">
+              <tr><td colspan="6" class="text-muted" style="padding:24px;text-align:center;">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================== LEADS =================== -->
+    <div class="page" id="page-leads">
+      <div class="page-header">
+        <div>
+          <h2>Leads</h2>
+          <p>Users who received a DM</p>
+        </div>
+        <button class="btn btn-ghost" onclick="exportLeads()">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Export CSV
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Comment</th>
+                <th>Post ID</th>
+                <th>Automation</th>
+                <th>DM Sent</th>
+              </tr>
+            </thead>
+            <tbody id="leads-body">
+              <tr><td colspan="5" class="text-muted" style="padding:24px;text-align:center;">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================== LOGS =================== -->
+    <div class="page" id="page-logs">
+      <div class="page-header">
+        <div>
+          <h2>DM Logs</h2>
+          <p>Full processing history</p>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <select style="width:auto;" onchange="loadLogs(this.value)">
+            <option value="">All statuses</option>
+            <option value="sent">Sent</option>
+            <option value="skipped_no_follow">Skipped (no follow)</option>
+            <option value="skipped_rate_limit">Skipped (rate limit)</option>
+            <option value="failed">Failed</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Username</th>
+                <th>Comment</th>
+                <th>Post ID</th>
+                <th>Status</th>
+                <th>Auto #</th>
+              </tr>
+            </thead>
+            <tbody id="logs-body">
+              <tr><td colspan="6" class="text-muted" style="padding:24px;text-align:center;">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- =================== AUTOMATION MODAL =================== -->
+<div class="modal-backdrop" id="automation-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">New Automation</h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+
+    <div class="form-grid">
+
+      <div class="form-group">
+        <label for="field-name">Name</label>
+        <input id="field-name" type="text" placeholder="e.g. Free Ebook Giveaway" />
+      </div>
+
+      <div class="form-group">
+        <label for="field-keyword">Trigger Keyword</label>
+        <input id="field-keyword" type="text" placeholder="e.g. FREE, send it, link" />
+        <p class="form-hint">Case-insensitive — any comment containing this word triggers the DM.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="field-message">DM Message</label>
+        <textarea id="field-message" rows="4"
+          placeholder="Hey {username}! Here's your free resource: https://..."></textarea>
+        <p class="form-hint">Use <code>{username}</code> to personalise the message.</p>
+      </div>
+
+      <div style="background:var(--surface2);border-radius:8px;padding:16px;">
+        <div class="toggle-row">
+          <div>
+            <div style="font-weight:600;font-size:13px;">Require Follow</div>
+            <div style="font-size:12px;color:var(--text-muted);">Only send DM if the commenter follows your account</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="field-require-follow" checked />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div style="font-weight:600;font-size:13px;">Active</div>
+            <div style="font-size:12px;color:var(--text-muted);">Pause without deleting</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="field-active" checked />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Posts to Watch</label>
+        <div id="post-selector"></div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAutomation()">Save Automation</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>

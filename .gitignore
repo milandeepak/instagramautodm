@@ -1,0 +1,12 @@
+data/
+*.pyc
+__pycache__/
+.env
+*.egg-info/
+dist/
+.venv/
+venv/
+.ruff_cache/
+*.log
+cloudflared.exe
+ngrok.exe
