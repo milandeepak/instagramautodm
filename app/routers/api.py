@@ -20,7 +20,6 @@ from app.schemas import (
     StatusOut,
 )
 from app.instagram_api_service import instagram_api_service
-from app.instagram_service import instagram_service
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -143,6 +142,8 @@ async def list_posts():
         if settings.integration_mode == "official":
             posts = await instagram_api_service.list_recent_media(20)
         else:
+            from app.instagram_service import instagram_service
+
             posts = await instagram_service.get_user_posts(20)
         return posts
     except Exception as exc:
@@ -162,6 +163,8 @@ async def get_status():
         logged_in = instagram_api_service.configured
         username = settings.instagram_username
     else:
+        from app.instagram_service import instagram_service
+
         logged_in = instagram_service.context is not None
         username = instagram_service.username if logged_in else None
 

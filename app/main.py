@@ -19,7 +19,6 @@ from fastapi.templating import Jinja2Templates
 
 from app.config import settings
 from app.database import init_db
-from app.instagram_service import instagram_service
 from app.routers.api import router as api_router
 
 logging.basicConfig(
@@ -38,6 +37,8 @@ async def lifespan(app: FastAPI):
     await init_db()
 
     if settings.integration_mode == "legacy":
+        from app.instagram_service import instagram_service
+
         logger.info("Logging in to Instagram via Playwright...")
         try:
             await instagram_service.start()
@@ -66,6 +67,8 @@ async def lifespan(app: FastAPI):
 
     # ----------------------------------------------------------------- shutdown
     if settings.integration_mode == "legacy":
+        from app.instagram_service import instagram_service
+
         scheduler.shutdown(wait=False)
         await instagram_service.stop()
         logger.info("Scheduler stopped.")
